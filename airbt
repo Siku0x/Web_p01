@@ -1,0 +1,149 @@
+import pygame
+import random
+import sys
+
+# 1. Initialize Pygame
+pygame.init()
+
+# 2. Game Constants
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+FPS = 60
+
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
+BLUE = (0, 0, 255)
+YELLOW = (255, 255, 0)
+
+# 3. Setup Display
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("2D Airplane Arcade Game")
+clock = pygame.time.Clock()
+
+# 4. Game Objects
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        # Create a simple airplane shape using a surface
+        self.image = pygame.Surface((50, 30), pygame.SRCALPHA)
+        # Body
+        pygame.draw.rect(self.image, GREEN, (0, 10, 50, 10))
+        # Wings
+        pygame.draw.polygon(self.image, GREEN, [(15, 10), (25, 0), (35, 10)])
+        pygame.draw.polygon(self.image, GREEN, [(15, 20), (25, 30), (35, 20)])
+        
+        self.rect = self.image.get_rect()
+        self.rect.left = 50
+        self.rect.centery = SCREEN_HEIGHT // 2
+        self.speed = 6
+
+    def update(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_UP] or keys[pygame.K_w]:
+            self.rect.y -= self.speed
+        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+            self.rect.y += self.speed
+            
+        # Keep player on screen
+        if self.rect.top < 0:
+            self.rect.top = 0
+        if self.rect.bottom > SCREEN_HEIGHT:
+            self.rect.bottom = SCREEN_HEIGHT
+
+    def shoot(self):
+        laser = Laser(self.rect.right, self.rect.centery)
+        all_sprites.add(laser)
+        lasers.add(laser)
+
+class Laser(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.Surface((15, 5))
+        self.image.fill(YELLOW)
+        self.rect = self.image.get_rect()
+        self.rect.left = x
+        self.rect.centery = y
+        self.speed = 10
+
+    def update(self):
+        self.rect.x += self.speed
+        # Delete if it goes off screen
+        if self.rect.left > SCREEN_WIDTH:
+            self.kill()
+
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.Surface((30, 30))
+        self.image.fill(RED)
+        self.rect = self.image.get_rect()
+        self.rect.x = SCREEN_WIDTH + 10
+        self.rect.y = random.randint(0, SCREEN_HEIGHT - 30)
+        self.speed = random.randint(3, 7)
+
+    def update(self):
+        self.rect.x -= self.speed
+        # Delete if it goes off screen
+        if self.rect.right < 0:
+            self.kill()
+
+# 5. Sprite Groups
+all_sprites = pygame.sprite.Group()
+enemies = pygame.sprite.Group()
+lasers = pygame.sprite.Group()
+
+player = Player()
+all_sprites.add(player)
+
+# Score
+score = 0
+font = pygame.font.SysFont("Arial", 30)
+
+# Custom event for spawning enemies
+SPAWN_ENEMY = pygame.USEREVENT + 1
+pygame.time.set_timer(SPAWN_ENEMY, 1000) # Spawn every 1 second
+
+# 6. Main Game Loop
+running = True
+while running:
+    # Event Handling
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                player.shoot()
+        elif event.type == SPAWN_ENEMY:
+            enemy = Enemy()
+            all_sprites.add(enemy)
+            enemies.add(enemy)
+
+    # Update Sprites
+    all_sprites.update()
+
+    # Collisions: Lasers hitting enemies
+    hits = pygame.sprite.groupcollide(enemies, lasers, True, True)
+    for hit in hits:
+        score += 10
+
+    # Collisions: Enemies hitting player
+    if pygame.sprite.spritecollideany(player, enemies):
+        print(f"Game Over! Final Score: {score}")
+        running = False
+
+    # Drawing
+    screen.fill(BLACK)
+    all_sprites.draw(screen)
+    
+    # Render Score
+    score_text = font.render(f"Score: {score}", True, WHITE)
+    screen.blit(score_text, (10, 10))
+
+    pygame.display.flip()
+    clock.tick(FPS)
+
+pygame.quit()
+sys.exit()
