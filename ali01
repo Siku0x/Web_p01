@@ -4,4 +4,4 @@ btn.addEventListener('click', () => {
   alert('Hello World!');
 });
 
-Console.WriteLine("Hello, World!");
+Console.WriteLine("Hello, pepole!");
