@@ -41,4 +41,4 @@ def transfer_ownership(_new_owner: address):
     assert msg.sender == self.owner, "Not owner"
     assert _new_owner != empty(address), "Invalid address"
     self.owner = _new_owner
-xwy
+xwyz
