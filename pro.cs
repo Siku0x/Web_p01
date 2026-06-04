@@ -20,4 +20,4 @@ if (manager.CheckOut("123"))
     Console.WriteLine("\nSuccessfully checked out 'The C# Guide'.");
 }
 
-// dk
+// dok
