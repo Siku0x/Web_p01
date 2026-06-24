@@ -6,4 +6,4 @@ btn.addEventListener('click', () => {
 
 Console.WriteLine("Hello, pepole!");
 
-lio
+lion
