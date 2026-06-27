@@ -5,7 +5,7 @@ var manager = new LibraryManager();
 
 // Seed data
 manager.AddBook(new Book { ISBN = "123", Title = "The C# Guide", Author = "John Doe" });
-manager.AddBook(new Book { ISBN = "486", Title = "Mastering .NET", Author = "Jane Smith" });
+manager.AddBook(new Book { ISBN = "476", Title = "Mastering .NET", Author = "Jane Smith" });
 
 Console.WriteLine("--- Library System ---");
 Console.WriteLine("Search results for 'C#':");
