@@ -21,3 +21,5 @@ if (manager.CheckOut("123"))
 }
 
 return 0;
+
+asis
